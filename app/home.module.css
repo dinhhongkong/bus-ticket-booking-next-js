@@ -1,0 +1,189 @@
+/*input{*/
+/*    color: black !important;*/
+/*}*/
+
+.grid{
+    color: black !important;
+}
+
+.hidden{
+    display: none;
+}
+
+.show{
+    display: block;
+}
+
+.home-search {
+    top: -80px;
+    left: 0;
+    right: 0;
+}
+
+.card-box-shadown {
+    box-shadow: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.2);
+}
+
+.search-form{
+    margin: auto;
+    max-width: 1128px;
+    background: #fff;
+    border: 1px solid rgba(239, 82, 34, .6);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    outline: 8px solid rgba(170, 46, 8, .1);
+}
+
+.input-search{
+    border: 1px solid #dde2e8;
+    padding: 12px 20px;
+    border-radius: 8px;
+    height: 67px;
+    /* position: relative; */
+}
+
+.switch-location {
+    position: absolute;
+    top: calc(100% / 2);
+    z-index: 10;
+    cursor: pointer;
+    -o-object-fit: contain;
+    object-fit: contain;
+    transition: .3s;
+    transform: rotate(0deg);
+}
+
+.switch-location:hover {
+    cursor: pointer;
+    transform: rotate(180deg);
+}
+
+.radio-group{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, .85);
+    font-size: 14px;
+    display: inline-block;
+    font-size: 0;
+}
+
+.radio-wrapper{
+    box-sizing: border-box;
+    padding: 0;
+    color: rgba(0, 0, 0, .85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: "tnum";
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    margin: 0 8px 0 0;
+    cursor: pointer;
+}
+
+.radio-wrapper-checked{
+    color: rgba(235, 158, 4, 0.85);
+    font-size: 14px;
+}
+
+.radio-wrapper-checked {
+    color: #ef5222;
+    font-weight: 500 !important;
+}
+
+.ant-radio {
+    box-sizing: border-box;
+    height: 16px;
+    width: 16px;
+    margin: 0;
+    margin-right: 8px;
+    padding: 0;
+    color: rgba(0, 0, 0, .85);
+    font-size: 16px;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: "tnum";
+    position: relative;
+    top: .2em;
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    border: 2px solid #918c8b;
+    border-radius: 50%;
+}
+
+
+
+.ant-radio-checked{
+    /* background-color: #ef5222; */
+    border-color: #ef5222;
+}
+
+.ant-radio-inner {
+    position: absolute;
+    top: 7px;
+    left: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    z-index: 2;
+
+    transition: background-color 0.3s, border-color 0.3s;
+    background-color: #ef5222;
+}
+
+.ant-radio-input {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    cursor: pointer;
+    opacity: 0;
+}
+
+/*button{*/
+/*    color: black !important;*/
+/*}*/
+
+#date-picker input{
+    color: black !important;
+    margin-top: 4px;
+    border: 1px solid #dde2e8;
+    padding: 12px 20px;
+    border-radius: 8px;
+    height: 67px;
+}
+
+.card-box-shadown{
+    box-shadow: 0 4px 4px rgba(239,82,34,.3), 0 -2px 8px rgba(239,82,34,.3), inset 0 0 0 1px #ef5222;
+}
+
+.custom-scroll-bar {}
+
+.custom-scroll-bar::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+.custom-scroll-bar::-webkit-scrollbar-track {
+    /* box-shadow: inset 0 0 5px grey; */
+    border-radius: 10px;
+}
+
+/* Handle */
+.custom-scroll-bar::-webkit-scrollbar-thumb {
+    background: rgb(206, 207, 210);
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.custom-scroll-bar::-webkit-scrollbar-thumb:hover {
+    background: #ef5222;
+}
+
+
