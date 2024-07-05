@@ -1,7 +1,6 @@
 import Link from "next/link";
-import person from '@/asserts/person.svg';
-import logo from "../../asserts/logo_new.svg"
-import Logout from "../../asserts/Logout.png"
+import person from '@/public/assets/person.svg';
+import logo from "@/public/assets/logo_new.svg"
 import styles from "./header.module.css"
 
 export default function Header() {
@@ -10,7 +9,7 @@ export default function Header() {
       <div className={ `${styles.headerHomePage} relative mx-auto w-full bg-white text-[13px] block h-[220px]`}>
         <div className="flex m-auto w-[1128px] h-[80px]">
           <div className="mt-4 flex flex-1 items-start"></div>
-          <div className="logo-banner z-10 mx-20">
+          <div className={`  z-10 mx-20`}>
             <Link href="/">
               <img alt="logo_banner" loading="lazy" style={{width: "295px", height: "60px", color: 'transparent'}}
                    src={logo.src}/>
@@ -29,11 +28,16 @@ export default function Header() {
 
         </div>
 
-        <div className={"nav-link-group content"}>
-          <Link className={styles.active} href="/">TRANG CHỦ</Link>
-          <Link className={styles.active} href="/tra-cuu-ve">TRA CỨU VÉ</Link>
-          <Link className={styles.active} href="/lien-he">LIÊN HỆ</Link>
-          <Link className={styles.active} href="/ve-chung-toi">VỀ CHÚNG TÔI</Link>
+
+        <div className={` ${styles.navLinkGroup} lg:content z-20 hidden items-center justify-center lg:flex`}>
+          <Link className={`mx-2 w-32 pb-3 text-center text-sm uppercase text-white
+      hover:font-bold hover:text-white border-b-4 border-b-white font-bold`} href="/">TRANG CHỦ</Link>
+          <Link className={`mx-2 w-32 pb-3 text-center text-sm uppercase text-white
+      hover:font-bold hover:text-white border-b-4 border-b-white font-bold`} href="/tra-cuu-ve">TRA CỨU VÉ</Link>
+          <Link className={`mx-2 w-32 pb-3 text-center text-sm uppercase text-white
+      hover:font-bold hover:text-white border-b-4 border-b-white font-bold`} href="/lien-he">LIÊN HỆ</Link>
+          <Link className={`mx-2 w-32 pb-3 text-center text-sm uppercase text-white
+      hover:font-bold hover:text-white border-b-4 border-b-white font-bold`} href="/ve-chung-toi">VỀ CHÚNG TÔI</Link>
         </div>
       </div>
     </>

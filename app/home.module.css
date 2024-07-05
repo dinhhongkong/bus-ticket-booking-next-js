@@ -1,4 +1,4 @@
-/*input{*/
+/*.custom-input{*/
 /*    color: black !important;*/
 /*}*/
 
@@ -14,13 +14,13 @@
     display: block;
 }
 
-.home-search {
+.homeSearch {
     top: -80px;
     left: 0;
     right: 0;
 }
 
-.card-box-shadown {
+.cardBoxShadown {
     box-shadow: 0 3px 6px rgba(0,0,0,.16), 0 3px 6px rgba(0,0,0,.2);
 }
 
@@ -33,6 +33,16 @@
     padding: 1.5rem;
     outline: 8px solid rgba(170, 46, 8, .1);
 }
+
+.banner {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    inset: 0px;
+    color: transparent;
+    /* Thêm các thuộc tính khác (ví dụ: background-image, background-size) nếu cần */
+}
+
 
 .input-search{
     border: 1px solid #dde2e8;
@@ -67,7 +77,12 @@
     display: inline-block;
     font-size: 0;
 }
-
+.radio-group-custom .ant-radio-wrapper {
+    margin-left: 0 !important;
+    margin-right: 20px;
+    font-weight: 400;
+    font-size: 15px !important;
+}
 .radio-wrapper{
     box-sizing: border-box;
     padding: 0;
@@ -146,9 +161,19 @@
     opacity: 0;
 }
 
-/*button{*/
-/*    color: black !important;*/
-/*}*/
+.ant-radio-group {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, .85);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5715;
+    list-style: none;
+    font-feature-settings: "tnum";
+    display: inline-block;
+    font-size: 0;
+}
 
 #date-picker input{
     color: black !important;
@@ -159,7 +184,7 @@
     height: 67px;
 }
 
-.card-box-shadown{
+.cardBoxShadown{
     box-shadow: 0 4px 4px rgba(239,82,34,.3), 0 -2px 8px rgba(239,82,34,.3), inset 0 0 0 1px #ef5222;
 }
 
