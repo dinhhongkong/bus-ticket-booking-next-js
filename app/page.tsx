@@ -6,11 +6,21 @@ import Picture from "@/public/assets/Artboard.png"
 import ProvincePicker from "@/components/province/province-picker";
 import {useState} from "react";
 import Datepicker from "react-tailwindcss-datepicker";
+import Test from "@/components/test/test";
 
 
 
 export default function Home() {
   const [showProvincePicker, setShowProvincePicker] = useState(false);
+  const [value, setValue] = useState({
+    startDate: null,
+    endDate: null
+  });
+
+  const handleValueChange = (newValue) => {
+    console.log("newValue:", newValue);
+    setValue(newValue);
+  }
 
 
   const handleOpenModal = (e) => {
@@ -59,16 +69,9 @@ export default function Home() {
               <div className={"grid grid-cols-1 pb-4 pt-4 lg:grid-cols-2 lg:gap-4"}>
                 <div className={"relative flex justify-center lg:gap-4"}>
                   <div className="flex-1">
-                    <div className={'relative z-20'}>
-                      <ProvincePicker show={showProvincePicker}  onClose={() => setShowProvincePicker(false)}/>
-                    </div>
-
                     <label>Điểm đi</label>
-                    <div onClick={handleOpenModal}
-                         className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center undefined text-base lg:text-lg`}>
-                    <span className="max-w-[140px] truncate lg:max-w-[220px]">Buôn Ma Thuột
-                      <div className="text-[13px] font-normal leading-[15px] text-[#4A4A4A]"></div>
-                    </span>
+                    <div className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg`}>
+                      <ProvincePicker title={"Điểm đi"}/>
                     </div>
                   </div>
 
@@ -77,15 +80,9 @@ export default function Home() {
                        alt="switch location icon"/>
 
                   <div className="flex-1 text-right lg:text-left">
-                    <div className={'relative z-20'}>
-                      <ProvincePicker show={showProvincePicker}  onClose={() => setShowProvincePicker(false)}/>
-                    </div>
                     <label>Điểm đến</label>
-                    <div onClick={handleOpenModal}
-                         className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
-                    <span className="max-w-[140px] truncate lg:max-w-[220px]">BX Mien Đông Mới
-                      <div className="text-[13px] font-normal leading-[15px] text-[#4A4A4A]"></div>
-                    </span>
+                    <div className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
+                      <ProvincePicker title={"Điểm đến"}/>
                     </div>
                   </div>
                 </div>
@@ -93,12 +90,21 @@ export default function Home() {
                 <div className="mr-4 flex flex-1 flex-col">
                   <label>Ngày đi</label>
                   <div
-                    className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
+                    className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
 
-                  <span className="max-w-[140px] truncate lg:max-w-[220px]">04/07/2024
-                    <div className="text-[13px] font-normal leading-[15px] text-[#4A4A4A]">
-
-                    </div>
+                  <span className="max-w-[140px] lg:max-w-[220px] z-20 focus:outline-none p-4">
+                    <Datepicker primaryColor={"orange"}
+                                useRange={false}
+                                asSingle={true}
+                                minDate={new Date()}
+                                local={"vn"}
+                                value={value}
+                                placeholder={"Chọn ngày đi"}
+                                inputClassName={"bg-white w-full rounded-md outline-none"}
+                                containerClassName="relative"
+                                displayFormat={"DD-MM-YYYY"}
+                                onChange={handleValueChange}
+                    />
                   </span>
                   </div>
                 </div>
@@ -181,11 +187,12 @@ export default function Home() {
 
         </div>
 
+
       </div>
 
-
+      <Test/>
       {/*<ProvincePicker show={showProvincePicker} position={modalPosition} onClose={() => setShowProvincePicker(false)}/>*/}
     </div>
 
-);
+  );
 }
