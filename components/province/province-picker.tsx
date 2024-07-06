@@ -50,7 +50,7 @@ export default function ProvincePicker({title}) {
       }
 
       <div className={"flex items-center w-full h-full" } onClick={togglePanel}>
-        <input placeholder={"Chọn " + title.toLowerCase()} readOnly={true} className="max-w-[140px] pl-4  truncate lg:max-w-[220px] font-medium outline-none" type={"text"} ></input>
+        <input placeholder={"Chọn " + title.toLowerCase()}  readOnly={true} className="max-w-[140px] pl-4 truncate lg:max-w-[220px] font-medium outline-none" type={"text"} ></input>
       </div>
 
     </div>
