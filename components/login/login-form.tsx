@@ -1,61 +1,40 @@
-import {Button, Checkbox, Form, FormProps, Input} from "antd";
+import {Button, Form, Input, Tooltip} from "antd";
+import {EllipsisOutlined, EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined, UserOutlined} from "@ant-design/icons";
 
 
-type FieldType = {
-  username?: string;
-  password?: string;
-  remember?: string;
-};
-
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-  console.log('Success:', values);
-};
-
-const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-};
 export default function LoginForm() {
   return (
     <Form
-      name="basic"
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
-      style={{ maxWidth: 600 }}
-      initialValues={{ remember: true }}
-      onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
-      autoComplete="off"
+      labelCol={{span: 8}}
+      wrapperCol={{span: 16}}
+      style={{maxWidth: 600}}
     >
-      <Form.Item<FieldType>
-        label="Username"
-        name="username"
-        rules={[{ required: true, message: 'Please input your username!' }]}
-      >
-        <Input />
-      </Form.Item>
+      <Input
+        placeholder="Nhập email"
+        prefix={<UserOutlined style={{color: 'rgba(0,0,0,.25)'}}/>}
+        suffix={
+          <Tooltip title="Nhập email">
+            <InfoCircleOutlined style={{color: 'rgba(0,0,0,.45)'}}/>
+          </Tooltip>
+        }
+        rootClassName={"mt-6 p-3"}
+      />
 
-      <Form.Item<FieldType>
-        label="Password"
-        name="password"
-        rules={[{ required: true, message: 'Please input your password!' }]}
-      >
-        <Input.Password />
-      </Form.Item>
+      <Input.Password
+        placeholder="Nhập mật khẩu"
+        prefix={<EllipsisOutlined/>}
+        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+        rootClassName={"mt-6 p-3"}
+      />
 
-      <Form.Item<FieldType>
-        name="remember"
-        valuePropName="checked"
-        wrapperCol={{ offset: 8, span: 16 }}
-      >
-        <Checkbox>Remember me</Checkbox>
-      </Form.Item>
+      <Button className={"p-5 mt-6 text-white bg-orange-600 cursor-pointer rounded-3xl w-full hover:bg-orange-600"}>
+        Đăng nhập
+      </Button>
 
-      <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
+      <div className={"text-orange-600 mt-5 font-medium cursor-pointer"}>Quên mật khẩu?</div>
     </Form>
+
+
   )
 
 }
