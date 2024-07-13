@@ -6,9 +6,7 @@ import Picture from "@/public/assets/Artboard.png"
 import ProvincePicker from "@/components/province/province-picker";
 import {useState} from "react";
 import Datepicker from "react-tailwindcss-datepicker";
-import Test from "@/components/test/test";
 import Trip from "@/components/trip/trip";
-
 
 
 export default function Home() {
@@ -18,12 +16,21 @@ export default function Home() {
     endDate: null
   });
 
+  const [isRoundTrip, setRoundTrip] = useState(1);
+
+  const handleRoundTripChange = (event) => {
+    console.log(event.target.value)
+
+    setRoundTrip(event.target.value)
+
+
+  }
+
+
   const handleValueChange = (newValue) => {
     console.log("newValue:", newValue);
     setValue(newValue);
   }
-
-
 
 
   return (
@@ -41,21 +48,29 @@ export default function Home() {
             <div className={`${styles['search-form']} m-2 font-medium lg:m-auto xl:w-[1128px]`}>
               {/*select ticket type*/}
               <div className={"flex items-center justify-between text-[15px]"}>
-                <div
-                  className={`${styles["ant-radio-group"]} ${styles["ant-radio-group-outline"]} ${styles["radio-group-custom"]}`}>
-                  <label className={`${styles["ant-radio-wrapper"]} ${styles["ant-radio-wrapper-checked"]}`}>
-                  <span className={`${styles['ant-radio']} ${styles['ant-radio-checked']}`}>
-                    <input type={"radio"} className={`${styles['ant-radio-input']}`}/>
+                <div>
+                  <label>
+                  <span>
+                    <input name={"isRoundTrip"}
+                           value={0}
+                           className={"align-middle mx-1"}
+                           type={"radio"}
+                           onChange={handleRoundTripChange}/>
                   </span>
-                    <span>Một chiều</span>
+                    <span className={"font-medium " + (isRoundTrip == 1 ? "" : "text-orange-600")}>Một chiều</span>
                   </label>
 
 
-                  <label className={`${styles["ant-radio-wrapper"]} ${styles["ant-radio-wrapper-checked"]}`}>
-                  <span className={`${styles['ant-radio']} ${styles['ant-radio-checked']}`}>
-                    <input type={"radio"} className={`${styles['ant-radio-input']}`}/>
+                  <label className={"ml-4"}>
+                  <span>
+                    <input name={"isRoundTrip"}
+                           value={1}
+                           className={"align-middle mx-1 "}
+                           type={"radio"}
+                           onChange={handleRoundTripChange}
+                    />
                   </span>
-                    <span>Khứ hồi</span>
+                    <span className={"font-medium " + (isRoundTrip ==1 ? "text-orange-600" : "")}>Khứ hồi</span>
                   </label>
                 </div>
 
@@ -68,7 +83,8 @@ export default function Home() {
                 <div className={"relative flex justify-center lg:gap-4"}>
                   <div className="flex-1">
                     <label>Điểm đi</label>
-                    <div className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg`}>
+                    <div
+                      className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg`}>
                       <ProvincePicker title={"Điểm đi"}/>
                     </div>
                   </div>
@@ -79,7 +95,8 @@ export default function Home() {
 
                   <div className="flex-1 text-right lg:text-left">
                     <label>Điểm đến</label>
-                    <div className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
+                    <div
+                      className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
                       <ProvincePicker title={"Điểm đến"}/>
                     </div>
                   </div>
@@ -110,10 +127,11 @@ export default function Home() {
                   </div>
 
                   {/*Chọn ngày về*/}
-                  <div className="mr-4 flex flex-1 flex-col">
-                    <label>Ngày về</label>
-                    <div
-                      className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
+                  {isRoundTrip ==1 && (
+                    <div className="mr-4 flex flex-1 flex-col">
+                      <label>Ngày về</label>
+                      <div
+                        className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
 
                   <span className="max-w-[140px] lg:max-w-[220px] z-20 focus:outline-none p-4">
                     <Datepicker primaryColor={"orange"}
@@ -129,11 +147,13 @@ export default function Home() {
                                 onChange={handleValueChange}
                     />
                   </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
 
                   {/*Chọn số vé*/}
-                  <div className="mr-4 flex flex-1 flex-col max-w-[90px]">
+                  <div className={"mr-4 flex flex-1 flex-col  " + (isRoundTrip==1 ? "max-w-[90px]":"")}>
                     <label>Số vé</label>
                     <div
                       className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
