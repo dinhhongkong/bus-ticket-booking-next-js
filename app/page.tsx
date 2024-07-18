@@ -7,6 +7,10 @@ import ProvincePicker from "@/components/province/province-picker";
 import {useState} from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import Trip from "@/components/trip/trip";
+import SleepingSeat from "@/components/trip/sleeping-seat";
+import LimousineSeat from "@/components/trip/limousine-seat";
+import CustomerInfo from "@/components/booking-ticket/customer-info";
+import {useProvince} from "@/hook/useProvince";
 
 
 export default function Home() {
@@ -18,12 +22,13 @@ export default function Home() {
 
   const [isRoundTrip, setRoundTrip] = useState(1);
 
+  const { provinces, loading, error } = useProvince();
+
+
+
   const handleRoundTripChange = (event) => {
     console.log(event.target.value)
-
     setRoundTrip(event.target.value)
-
-
   }
 
 
@@ -85,7 +90,7 @@ export default function Home() {
                     <label>Điểm đi</label>
                     <div
                       className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg`}>
-                      <ProvincePicker title={"Điểm đi"}/>
+                      <ProvincePicker title={"Điểm đi"} provinces={provinces}/>
                     </div>
                   </div>
 
@@ -97,7 +102,7 @@ export default function Home() {
                     <label>Điểm đến</label>
                     <div
                       className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
-                      <ProvincePicker title={"Điểm đến"}/>
+                      <ProvincePicker title={"Điểm đến"} provinces={provinces}/>
                     </div>
                   </div>
                 </div>
@@ -267,7 +272,15 @@ export default function Home() {
 
         </div>
       </div>
+
+      <div className={"flex"}>
+        <SleepingSeat></SleepingSeat>
+        <LimousineSeat></LimousineSeat>
+        <CustomerInfo/>
+      </div>
+
     </div>
+
 
   );
 }

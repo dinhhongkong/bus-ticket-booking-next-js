@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import Image from "next/image";
 
-export default function ProvincePicker({title}) {
+export default function ProvincePicker({title, provinces}) {
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +22,7 @@ export default function ProvincePicker({title}) {
     setIsOpen(!isOpen);
   };
 
+
   return (
     <div className="relative w-full h-full ">
       {isOpen && (
@@ -39,9 +40,13 @@ export default function ProvincePicker({title}) {
             <div className={``}>
               <div className={`px-4 py-3 font-medium uppercase`}>Tỉnh/Thành phố</div>
               <div className={'overflow-y-scroll h-64'}>
-                <div className={`flex cursor-pointer border-b border-neutral-200 px-4 py-3 hover:bg-[#FEF6F3] `}>
-                  <div className="cursor-pointer text-[15px] font-medium">An Giang</div>
-                </div>
+                {
+                  provinces?.map(province => (
+                    <div key={province.id} className={`flex cursor-pointer border-b border-neutral-200 px-4 py-3 hover:bg-[#FEF6F3] `}>
+                      <div className="cursor-pointer text-[15px] font-medium">{province.provinceName}</div>
+                    </div>
+                  ))
+                }
               </div>
             </div>
           </div>

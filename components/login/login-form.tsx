@@ -1,5 +1,6 @@
 import {Button, Form, Input, Tooltip} from "antd";
 import {EllipsisOutlined, EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined, UserOutlined} from "@ant-design/icons";
+import CustomButton from "@/components/ui/custom-button";
 
 
 export default function LoginForm() {
