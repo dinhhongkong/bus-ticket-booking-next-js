@@ -4,8 +4,28 @@ import PriceDetail from "@/components/trip/price-detail";
 import SleepingSeat from "@/components/trip/sleeping-seat";
 import LimousineSeat from "@/components/trip/limousine-seat";
 import {Form, Input} from "antd";
+import {useEffect} from "react";
+import {fetchData} from "@/api/apiClient";
 
-export default function BookingTicket() {
+export default function BookingTicket({params}) {
+
+
+  useEffect(() => {
+    async function loadProvinces() {
+      try {
+        const data = await fetchData('/booking/trip/' + params.slug);
+
+        console.log(data)
+      } catch (err) {
+        console.error('Error loading provinces:', err);
+      } finally {
+
+      }
+    }
+    loadProvinces();
+  }, []);
+
+
   return (
     <div className={"w-full bg-[#f3f3f5]"}>
       <div className={" max-w-[1128px] ml-auto mr-auto pb-2 md:pb-8 lg:block"}>
@@ -17,7 +37,7 @@ export default function BookingTicket() {
               <div className={"my-4 flex flex-row text-center font-medium gap-4 sm:gap-6"}>
                 {/*<SleepingSeat/>*/}
                 <LimousineSeat/>
-                {/*<SleepingSeat/>*/}
+                <SleepingSeat/>
               </div>
               <div className="mb-4 flex justify-center gap-4 text-[13px] font-normal">
                   <span className="mr-8 flex items-center">

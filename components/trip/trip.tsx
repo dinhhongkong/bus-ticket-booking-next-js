@@ -1,30 +1,45 @@
 import Image from "next/image";
+import {formatTime, getHours} from "@/utils/timeUtils";
+import {formatCurrency} from "@/utils/formatCurrency";
+import Link from "next/link";
 
-export default function Trip() {
+interface TripProps {
+  "id": number,
+  "departureDay": string,
+  "price": number,
+  "departureTime": string,
+  "travelTime": string,
+  "destinationTime": string,
+  "busType": string,
+  "emptySeat": number,
+  "departureProvince": string,
+  "destProvince": string
+}
+export default function Trip( tripProps:TripProps ) {
   return (
     <div className={"rounded-xl border-2  px-4 py-4 shadow mb-5 hover:border-orange-500 hover:shadow-2xl transition-shadow"}>
 
       <div className={"flex justify-between pt-3 "}>
         <div className={"flex-1"}>
           <div className={"flex justify-between items-center gap-4"}>
-            <span className={"text-2xl font-medium"}>8h00</span>
+            <span className={"text-2xl font-medium"}>{formatTime(tripProps.departureTime)}</span>
             <div className={"flex items-center w-full"}>
               <Image src={"/assets/pickup.svg"} alt={"pickup"} width={15} height={15}/>
               <span className="flex-1 border-b-2 border-dotted"></span>
               <span className={"text-center text-gray-500 font-medium"}>
-                {"8 Giờ"}
+                {getHours(tripProps.travelTime)} Giờ
                 <br/>
                 <span className="text-[13px] text-gray-500 font-medium">(Asian/Ho Chi Minh)</span>
               </span>
               <span className="flex-1 border-b-2 border-dotted"></span>
               <Image src={"/assets/station.svg"} alt={"pickup"} width={15} height={15}/>
             </div>
-            <span className={"text-2xl font-medium"}>9h00</span>
+            <span className={"text-2xl font-medium"}>{formatTime(tripProps.destinationTime)}</span>
           </div>
 
           <div className={"flex justify-between"}>
-            <span>Bến xe miền đông</span>
-            <span>Bến xe miền đông</span>
+            <span>{tripProps.departureProvince}</span>
+            <span>{tripProps.destProvince}</span>
           </div>
         </div>
 
@@ -33,12 +48,12 @@ export default function Trip() {
           <div className="text-gray hidden min-w-[200px] flex-wrap items-center gap-2 lg:flex">
             <div className={"flex items-center font-medium"}>
               <div className="h-[6px] w-[6px] rounded-full bg-[#C8CCD3] m-1"></div>
-              <span className={"text-gray-500"} >Giường</span>
+              <span className={"text-gray-500"} >{tripProps.busType}</span>
               <div className="ml-3 h-[6px] w-[6px] rounded-full bg-[#C8CCD3] m-1 "></div>
-              <span className="text-green-900">40 chỗ trống</span>
+              <span className="text-green-900">{tripProps.emptySeat} chỗ trống</span>
             </div>
 
-            <span className="mt-2 w-full text-end text-lg font-semibold text-orange-600">275.000đ</span>
+            <span className="mt-2 w-full text-end text-lg font-semibold text-orange-600">{formatCurrency(tripProps.price)}</span>
           </div>
         </div>
       </div>
@@ -48,9 +63,10 @@ export default function Trip() {
       {/*<hr/>*/}
 
       <div className={"flex flex-grow "}>
-        <button className={"mr-0 ml-auto rounded-xl font-medium bg-orange-200 text-orange-600 p-1 hover:bg-orange-600 hover:text-white"}>
+        <Link className={"mr-0 ml-auto rounded-xl font-medium bg-orange-200 text-orange-600 p-1 hover:bg-orange-600 hover:text-white"}
+              href={"/booking-ticket/"+tripProps.id}>
           <span className={"m-1"}>Chọn chuyến</span>
-        </button>
+        </Link>
       </div>
 
     </div>

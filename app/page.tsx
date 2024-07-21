@@ -7,15 +7,27 @@ import ProvincePicker from "@/components/province/province-picker";
 import {useState} from "react";
 import Datepicker from "react-tailwindcss-datepicker";
 import Trip from "@/components/trip/trip";
-import SleepingSeat from "@/components/trip/sleeping-seat";
-import LimousineSeat from "@/components/trip/limousine-seat";
-import CustomerInfo from "@/components/booking-ticket/customer-info";
 import {useProvince} from "@/hook/useProvince";
+import {fetchData} from "@/api/apiClient";
+import Loading from "@/components/loading";
+import Notification from "@/components/notification/notification";
 
+interface SearchProps{
+  departureProvinceId: number,
+  destinationProvinceId: number,
+  startDate: string,
+  isRoundTrip?: boolean|undefined,
+  endDate?: string|undefined
+}
 
 export default function Home() {
 
-  const [value, setValue] = useState({
+  const [startDate, setStartDate] = useState({
+    startDate: null,
+    endDate: null
+  });
+
+  const [endDate, setEndDate] = useState({
     startDate: null,
     endDate: null
   });
@@ -24,17 +36,66 @@ export default function Home() {
 
   const { provinces, loading, error } = useProvince();
 
+  const [searchProps, setSearchProps] =  useState<SearchProps>({
+    departureProvinceId: 0,
+    destinationProvinceId: 0,
+    startDate: ''
+  })
+
+  const [responseSearch, setResponseSearch] = useState([])
+  const [isLoading, setIsLoading] = useState(false);
+
+  const updateDepartureProvinceId = (newId: number) => {
+    setSearchProps(prevState => ({
+      ...prevState,
+      departureProvinceId: newId
+    }));
+  };
+
+  const updateDestinationProvinceId = (newId: number) => {
+    setSearchProps(prevState => ({
+      ...prevState,
+      destinationProvinceId: newId
+    }));
+  };
+
+  const updateStartDate = (newDate) => {
+    setSearchProps(prevState => ({
+      ...prevState,
+      startDate: newDate.startDate
+    }));
+    setStartDate(newDate);
+  };
+
+  const updateEndDate = (newDate) => {
+    setSearchProps(prevState => ({
+      ...prevState,
+      endDate: newDate.endDate
+    }));
+    setEndDate(newDate);
+  };
+
+
 
 
   const handleRoundTripChange = (event) => {
-    console.log(event.target.value)
     setRoundTrip(event.target.value)
   }
 
 
-  const handleValueChange = (newValue) => {
-    console.log("newValue:", newValue);
-    setValue(newValue);
+  const onClickBtnSearch = async (event) => {
+    setIsLoading(true)
+    try {
+      const data = await fetchData("booking/search/trip", searchProps);
+      setResponseSearch(data)
+      console.log(data)
+    }
+    catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    finally {
+      setIsLoading(false)
+    }
   }
 
 
@@ -90,7 +151,7 @@ export default function Home() {
                     <label>Điểm đi</label>
                     <div
                       className={`${styles['input-search']} item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg`}>
-                      <ProvincePicker title={"Điểm đi"} provinces={provinces}/>
+                      <ProvincePicker title={"Điểm đi"} provinces={provinces} onSelectProvince={updateDepartureProvinceId} />
                     </div>
                   </div>
 
@@ -102,7 +163,7 @@ export default function Home() {
                     <label>Điểm đến</label>
                     <div
                       className={` ${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center justify-end lg:justify-start text-base lg:text-lg `}>
-                      <ProvincePicker title={"Điểm đến"} provinces={provinces}/>
+                      <ProvincePicker title={"Điểm đến"} provinces={provinces} onSelectProvince={updateDestinationProvinceId} />
                     </div>
                   </div>
                 </div>
@@ -120,12 +181,12 @@ export default function Home() {
                                 asSingle={true}
                                 minDate={new Date()}
                                 local={"vn"}
-                                value={value}
+                                value={startDate}
                                 placeholder={"Chọn ngày đi"}
                                 inputClassName={"bg-white w-full rounded-md outline-none"}
                                 containerClassName="relative"
                                 displayFormat={"DD-MM-YYYY"}
-                                onChange={handleValueChange}
+                                onChange={updateStartDate}
                     />
                   </span>
                     </div>
@@ -144,12 +205,12 @@ export default function Home() {
                                 asSingle={true}
                                 minDate={new Date()}
                                 local={"vn"}
-                                value={value}
+                                value={endDate}
                                 placeholder={"Chọn ngày về"}
                                 inputClassName={"bg-white w-full rounded-md outline-none"}
                                 containerClassName="relative"
                                 displayFormat={"DD-MM-YYYY"}
-                                onChange={handleValueChange}
+                                onChange={updateEndDate}
                     />
                   </span>
                       </div>
@@ -177,14 +238,13 @@ export default function Home() {
               </div>
               <div className="relative z-10 flex w-full justify-center">
                 <button
+                  onClick={onClickBtnSearch}
                   className="absolute h-12 rounded-full bg-orange-600 px-20 text-base text-white transition duration-200">
                   Tìm chuyến xe
                 </button>
               </div>
             </div>
-
           </div>
-
         </section>
 
 
@@ -259,11 +319,16 @@ export default function Home() {
               </span>
               </div>
 
-              <Trip></Trip>
-              <Trip></Trip>
-              <Trip></Trip>
-              <Trip></Trip>
-              <Trip></Trip>
+              {isLoading ? (
+                <Loading/>
+              ) : responseSearch.length > 0 ? (
+                responseSearch.map((trip) => (
+                  <Trip key={trip.id} {...trip} />
+                ))
+              ) : (
+                <p>Không có chuyến đi nào được tìm thấy.</p>
+              )}
+
 
             </div>
           </div>
@@ -272,13 +337,6 @@ export default function Home() {
 
         </div>
       </div>
-
-      <div className={"flex"}>
-        <SleepingSeat></SleepingSeat>
-        <LimousineSeat></LimousineSeat>
-        <CustomerInfo/>
-      </div>
-
     </div>
 
 

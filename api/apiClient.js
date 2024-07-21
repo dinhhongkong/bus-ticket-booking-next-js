@@ -25,9 +25,9 @@ apiClient.interceptors.request.use(
   });
 
 
-export const fetchData = async (endpoint) => {
+export const fetchData = async (endpoint, params = {}) => {
   try {
-    const response = await apiClient.get(endpoint);
+    const response = await apiClient.get(endpoint, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
