@@ -13,14 +13,10 @@ import Loading from "@/components/loading";
 import { useRouter } from 'next/navigation';
 import Notification from "@/components/notification/notification";
 import {useNotification} from "@/context/NotificationContext";
+import {useCustomerInfo} from "@/context/CustomerContext";
+import {isDateGreaterThan} from "@/utils/timeUtils";
+import {Tabs} from "antd";
 
-interface SearchProps{
-  departureProvinceId: number,
-  destinationProvinceId: number,
-  startDate: string,
-  isRoundTrip?: boolean|undefined,
-  endDate?: string|undefined
-}
 
 export default function Home() {
 
@@ -36,86 +32,166 @@ export default function Home() {
     endDate: null
   });
 
-  const [isRoundTrip, setRoundTrip] = useState(1);
-
-  const { provinces, loading, error } = useProvince();
-
-  const [searchProps, setSearchProps] =  useState<SearchProps>({
-    departureProvinceId: 0,
-    destinationProvinceId: 0,
-    startDate: ''
+  const { provinces } = useProvince();
+  const [responseDeparture, setResponseDeparture] = useState([])
+  const [responseDestination, setResponseDestination] = useState([])
+  const [activeSearch, setActiveSearch] = useState(false)
+  const [search, setSearch] = useState({
+    provinceStart: 0,
+    provinceEnd: 0,
+    startName: "",
+    endName: "",
+    dayStart: "",
+    dayEnd: "",
   })
-
-  const [responseSearch, setResponseSearch] = useState([])
   const [isLoading, setIsLoading] = useState(false);
-
   const router = useRouter();
+  const {tripInfo, setTripInfo} = useCustomerInfo()
+  const {tripSelection, setTripSelection} = useState()
 
-  const handleTripSelection = (tripId) => {
-    router.push(`/booking-ticket?id=${tripId}&isRoundTrip=${isRoundTrip}`)
+
+  const handleDepartureTripSelection = (tripProps) => {
+    if (!tripInfo.isRoundTrip) {
+      setTripInfo( preState => ({
+        ...preState,
+        departure: {
+          ...preState.departure,
+          id: tripProps.id
+        }
+      }))
+      // console.log(tripInfo)
+      router.push(`/booking-ticket`)
+      return
+    }
+    if (tripInfo.departure.id !== 0 && tripInfo.departure.id !== 0) {
+      setTripInfo( preState => ({
+        ...preState,
+        departure: {
+          ...preState.departure,
+          id: tripProps.id
+        }
+      }))
+      router.push(`/booking-ticket`)
+      return;
+    }
+    setTripInfo( preState => ({
+      ...preState,
+      departure: {
+        ...preState.departure,
+        id: tripProps.id
+      }
+    }))
+
+
+
   };
 
-  const updateDepartureProvinceId = (newId: number) => {
-    setSearchProps(prevState => ({
+  const handleDestinationTripSelection= (tripProps) => {
+    if (tripInfo.departure.id !== 0 && tripInfo.departure.id !== 0) {
+      setTripInfo( preState => ({
+        ...preState,
+        destination: {
+          ...preState.destination,
+          id: tripProps.id
+        }
+      }))
+      router.push(`/booking-ticket`)
+      return
+    }
+    setTripInfo( preState => ({
+      ...preState,
+      destination: {
+        ...preState.destination,
+        id: tripProps.id
+      }
+    }))
+
+  };
+
+  const updateDepartureProvinceId = (newId: number, name: string) => {
+    setSearch(prevState => ({
       ...prevState,
-      departureProvinceId: newId
+      provinceStart: newId,
+      startName: name
     }));
   };
 
-  const updateDestinationProvinceId = (newId: number) => {
-    setSearchProps(prevState => ({
+  const updateDestinationProvinceId = (newId: number, name: string) => {
+    setSearch(prevState => ({
       ...prevState,
-      destinationProvinceId: newId
+      provinceEnd: newId,
+      endName: name
     }));
   };
 
   const updateStartDate = (newDate) => {
-    setSearchProps(prevState => ({
+    setSearch(prevState => ({
       ...prevState,
-      startDate: newDate.startDate
+      dayStart: newDate.startDate
     }));
     setStartDate(newDate);
   };
 
   const updateEndDate = (newDate) => {
-    setSearchProps(prevState => ({
+    setSearch(prevState => ({
       ...prevState,
-      endDate: newDate.endDate
+      dayEnd: newDate.endDate
     }));
     setEndDate(newDate);
   };
 
-
-
-
   const handleRoundTripChange = (event) => {
-    setRoundTrip(event.target.value)
+    const value = event.target.value == 1
+    setTripInfo(preState => ({
+      ...preState,
+      isRoundTrip: value
+    }))
+    setActiveSearch(false)
   }
 
 
   const onClickBtnSearch = async (event) => {
-    if (searchProps.startDate.length === 0) {
-      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày đi', type: 'error' })
-      return
-    }
-    else if (searchProps.endDate?.length ===0 && isRoundTrip == true) {
-      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày về', type: 'error' })
-      return
-    }
-    else if (searchProps.departureProvinceId == 0) {
+    if (search.provinceStart == 0) {
       setNotification({ show: true, message: 'Quý khách vui chọn điểm đi', type: 'error' })
       return
     }
-    else if (searchProps.destinationProvinceId == 0) {
+    else if (search.provinceEnd == 0) {
       setNotification({ show: true, message: 'Quý khách vui lòng điểm đến', type: 'error' })
       return
     }
+    else if (search.dayStart.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày đi', type: 'error' })
+      return
+    }
+    else if (search.dayEnd.length ===0 && tripInfo.isRoundTrip) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày về', type: 'error' })
+      return
+    }
+    else if ( !isDateGreaterThan( search.dayEnd, search.dayStart) &&  tripInfo.isRoundTrip) {
+      setNotification({ show: true, message: 'Quý khách vui lòng chọn ngày về lớn hơn ngày đi', type: 'error' })
+      return
+    }
+
+    setTripInfo( preState => ({
+      ...preState,
+      departure: {
+        ...preState.departure,
+        id: 0
+      },
+      destination: {
+        ...preState.destination,
+        id: 0
+      }
+    }))
 
     setIsLoading(true)
     try {
-      const data = await fetchData("booking/search/trip", searchProps);
-      setResponseSearch(data)
-      console.log(data)
+      const data = await fetchData("booking/search/trip", {
+        departureProvinceId: search.provinceStart,
+        destinationProvinceId: search.provinceEnd,
+        startDate: search.dayStart
+      });
+      setResponseDeparture(data)
     }
     catch (error) {
       console.error("Error fetching data:", error);
@@ -123,7 +199,73 @@ export default function Home() {
     finally {
       setIsLoading(false)
     }
+
+    if (tripInfo.isRoundTrip) {
+      try {
+        const data = await fetchData("booking/search/trip", {
+          departureProvinceId: search.provinceEnd,
+          destinationProvinceId: search.provinceStart,
+          startDate: search.dayEnd
+        });
+        setResponseDestination(data)
+        console.log("call ve")
+      }
+      catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      finally {
+        setIsLoading(false)
+      }
+    }
+    setActiveSearch(true)
   }
+
+  const setItemTab = () =>{
+    if (tripInfo.isRoundTrip) {
+      return[{
+        key: '1',
+        label: "CHUYẾN ĐI: " + search.startName + ' - ' + search.endName,
+        children: isLoading ? (
+          <Loading/>
+        ) : responseDeparture.length > 0 ? (
+          responseDeparture.map((trip) => (
+            <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleDepartureTripSelection(trip)} />
+          ))
+        ) : (
+          <p>Không có chuyến đi nào được tìm thấy.</p>
+        ),
+      },
+        {
+          key: '2',
+          label: "CHUYẾN VỀ: " + search.endName + ' - '+ search.startName,
+          children: isLoading ? (
+            <Loading/>
+          ) : responseDestination.length > 0 ? (
+            responseDestination.map((trip) => (
+              <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleDestinationTripSelection(trip)} />
+            ))
+          ) : (
+            <p>Không có chuyến đi nào được tìm thấy.</p>
+          ),
+        }]
+
+    }
+
+    return [{
+      key: '1',
+      label: "CHUYẾN ĐI: " + search.startName + ' - ' + search.endName,
+      children: isLoading ? (
+        <Loading/>
+      ) : responseDeparture.length > 0 ? (
+        responseDeparture.map((trip) => (
+          <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleDepartureTripSelection(trip)} />
+        ))
+      ) : (
+        <p>Không có chuyến đi nào được tìm thấy.</p>
+      ),
+    }]
+  }
+
 
 
   return (
@@ -148,9 +290,11 @@ export default function Home() {
                            value={0}
                            className={"align-middle mx-1"}
                            type={"radio"}
-                           onChange={handleRoundTripChange}/>
+                           onChange={handleRoundTripChange}
+                           defaultChecked
+                    />
                   </span>
-                    <span className={"font-medium " + (isRoundTrip == 1 ? "" : "text-orange-600")}>Một chiều</span>
+                    <span className={"font-medium " + (tripInfo.isRoundTrip ? "" : "text-orange-600")}>Một chiều</span>
                   </label>
 
 
@@ -163,7 +307,7 @@ export default function Home() {
                            onChange={handleRoundTripChange}
                     />
                   </span>
-                    <span className={"font-medium " + (isRoundTrip ==1 ? "text-orange-600" : "")}>Khứ hồi</span>
+                    <span className={"font-medium " + (tripInfo.isRoundTrip  ? "text-orange-600" : "")}>Khứ hồi</span>
                   </label>
                 </div>
 
@@ -212,7 +356,7 @@ export default function Home() {
                                 placeholder={"Chọn ngày đi"}
                                 inputClassName={"bg-white w-full rounded-md outline-none"}
                                 containerClassName="relative"
-                                displayFormat={"DD-MM-YYYY"}
+                                displayFormat={"DD/MM/YYYY"}
                                 onChange={updateStartDate}
                     />
                   </span>
@@ -220,7 +364,7 @@ export default function Home() {
                   </div>
 
                   {/*Chọn ngày về*/}
-                  {isRoundTrip ==1 && (
+                  {tripInfo.isRoundTrip && (
                     <div className="mr-4 flex flex-1 flex-col">
                       <label>Ngày về</label>
                       <div
@@ -236,7 +380,7 @@ export default function Home() {
                                 placeholder={"Chọn ngày về"}
                                 inputClassName={"bg-white w-full rounded-md outline-none"}
                                 containerClassName="relative"
-                                displayFormat={"DD-MM-YYYY"}
+                                displayFormat={"DD/MM/YYYY"}
                                 onChange={updateEndDate}
                     />
                   </span>
@@ -246,7 +390,7 @@ export default function Home() {
 
 
                   {/*Chọn số vé*/}
-                  <div className={"mr-4 flex flex-1 flex-col  " + (isRoundTrip==1 ? "max-w-[90px]":"")}>
+                  <div className={"mr-4 flex flex-1 flex-col  " + (tripInfo.isRoundTrip ? "max-w-[90px]":"")}>
                     <label>Số vé</label>
                     <div
                       className={`${styles['input-search']}  item-start mt-1 flex w-full cursor-pointer font-medium lg:items-center text-base lg:text-lg `}>
@@ -338,23 +482,29 @@ export default function Home() {
 
             {/*trip*/}
             <div className={"w-full"}>
-              <div className={"font-medium text-xl"}>
-              <span>
-                <span>Hồ Chí Minh</span>
-                <span className={"px-2"}>-</span>
-                <span>Đắk Lắk</span>
-              </span>
-              </div>
-
-              {isLoading ? (
-                <Loading/>
-              ) : responseSearch.length > 0 ? (
-                responseSearch.map((trip) => (
-                  <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleTripSelection(trip.id)} />
-                ))
-              ) : (
-                <p>Không có chuyến đi nào được tìm thấy.</p>
+              {activeSearch && (
+                <Tabs defaultActiveKey="1" items={setItemTab()}/>
               )}
+
+              {/*<div className={"flex justify-between font-medium text-xl mb-3"}>*/}
+              {/*  <div className={"flex-1 py-2 flex items-center justify-center rounded-xl"}>*/}
+              {/*    {search.startName + ' - ' + search.endName }*/}
+              {/*  </div>*/}
+
+              {/*  {tripInfo.isRoundTrip && (*/}
+              {/*    <div className={"flex-1 flex items-center justify-center"}>{search.endName + ' - '+ search.startName}</div>)}*/}
+
+              {/*</div>*/}
+
+              {/*{isLoading ? (*/}
+              {/*  <Loading/>*/}
+              {/*) : responseDeparture.length > 0 ? (*/}
+              {/*  responseDeparture.map((trip) => (*/}
+              {/*    <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleTripSelection(trip.id)} />*/}
+              {/*  ))*/}
+              {/*) : (*/}
+              {/*  <p>Không có chuyến đi nào được tìm thấy.</p>*/}
+              {/*)}*/}
 
 
             </div>

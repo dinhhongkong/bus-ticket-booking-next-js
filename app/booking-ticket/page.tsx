@@ -23,17 +23,15 @@ interface TripDetails {
 }
 
 export default function BookingTicket() {
-  const detailsParams = useSearchParams()
-  const id = detailsParams.get("id")
   const {setNotification} = useNotification()
-
-  const [details, setDetails] = useState<TripDetails>(null);
-  const {customerInfo, setCustomerInfo } = useCustomerInfo();
+  const {customerInfo, setCustomerInfo ,tripInfo, setTripInfo} = useCustomerInfo()
   const [selectedSeats, setSelectedSeats] = useState([]);
+
 
   const router = useRouter();
 
   const onClickPayment = (event) => {
+    console.log(tripInfo)
     if (selectedSeats.length === 0) {
       setNotification({ show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế', type: 'error' })
       return
@@ -51,17 +49,6 @@ export default function BookingTicket() {
       return
     }
 
-    setCustomerInfo(
-      prevInfo => ({
-          ...prevInfo,
-        departureTime: details.departureTime,
-        departureDay: details.departureDay,
-        price: details.price,
-        selectedSeat: selectedSeats,
-        departureProvince: details.departureProvince,
-        destProvince: details.destProvince
-      })
-    )
     router.push("/payment")
   };
 
@@ -96,16 +83,49 @@ export default function BookingTicket() {
   useEffect(() => {
     async function loadTripDetails() {
       try {
-        const data :TripDetails = await fetchData('/booking/trip/' + id);
-        setDetails(data)
-        console.log(data)
+        const data1 :TripDetails = await fetchData('/booking/trip/' + tripInfo.departure.id);
+        console.log(data1)
+        setTripInfo(preState => ({
+          ...preState,
+          departure: {
+            ...preState.departure,
+            day: data1["departureDay"],
+            time: data1["departureTime"],
+            price: data1["price"],
+            type: data1["busType"],
+            provinceStart: data1["departureProvince"],
+            provinceEnd: data1["destProvince"],
+            disableSeat: data1["disableSeat"]
+          }
+        }))
+        console.log(tripInfo)
+        if(tripInfo.isRoundTrip) {
+          const data2 :TripDetails = await fetchData('/booking/trip/' + tripInfo.destination.id);
+
+          setTripInfo(preState => ({
+            ...preState,
+            destination: {
+              ...preState.destination,
+              day: data2["departureDay"],
+              time: data2["departureTime"],
+              price: data2["price"],
+              type: data2["busType"],
+              provinceStart: data2["departureProvince"],
+              provinceEnd: data2["destProvince"],
+              disableSeat: data2["disableSeat"]
+            }
+          }))
+          console.log(tripInfo)
+        }
+
       } catch (err) {
         console.error('Error loading provinces:', err);
-      } finally {
-
+      }
+      finally {
+        console.log(tripInfo)
       }
     }
-    loadTripDetails();
+    loadTripDetails()
   }, []);
 
 
@@ -119,15 +139,31 @@ export default function BookingTicket() {
               {/*select seat*/}
               <div className={"my-4 flex flex-row text-center font-medium gap-4 sm:gap-6"}>
 
-                {details?.busType === "Giường" && (
-                  <SleepingSeat disabledSeats={details.disableSeat}
+                {tripInfo.departure.type === "Giường" && (
+                  <SleepingSeat disabledSeats={tripInfo.departure.disableSeat}
                                 selectedSeats={selectedSeats}
                                 setSelectedSeats={setSelectedSeats}/>
                 )}
 
-                {details?.busType ==="Limousine" && (
-                  <LimousineSeat/>
+                {tripInfo.departure.type === "Limousine" && (
+                  <LimousineSeat disabledSeats={tripInfo.departure.disableSeat}
+                                selectedSeats={selectedSeats}
+                                setSelectedSeats={setSelectedSeats}/>
                 )}
+
+                {tripInfo.destination.type === "Giường" && (
+                  <SleepingSeat disabledSeats={tripInfo.destination.disableSeat}
+                                selectedSeats={selectedSeats}
+                                setSelectedSeats={setSelectedSeats}/>
+                )}
+
+                {tripInfo.destination.type === "Limousine" && (
+                  <LimousineSeat disabledSeats={tripInfo.destination.disableSeat}
+                                 selectedSeats={selectedSeats}
+                                 setSelectedSeats={setSelectedSeats}/>
+                )}
+
+
 
               </div>
               <div className="mb-4 flex justify-center gap-4 text-[13px] font-normal">
@@ -274,22 +310,22 @@ export default function BookingTicket() {
           </div>
 
           <div className={"mx-auto flex min-w-[345px] flex-col gap-6"}>
-            {details != null && (
+            {tripInfo && (
               <>
                 <TripDetail title={"lượt đi"}
-                            date={details.departureDay}
-                            time={details.departureTime}
-                            price={details.price}
+                            date={tripInfo.departure.day}
+                            time={tripInfo.departure.time}
+                            price={tripInfo.departure.price}
                             seats={selectedSeats}
-                            provinceStart={details.departureProvince}
-                            provinceEnd={details.destProvince}
+                            provinceStart={tripInfo.departure.provinceStart}
+                            provinceEnd={tripInfo.departure.provinceEnd}
                 />
-                <PriceDetail  price={details.price}
+                <PriceDetail  price={tripInfo.departure.price}
                               seats={selectedSeats}/>
               </>
-
-
             )}
+
+
 
 
 

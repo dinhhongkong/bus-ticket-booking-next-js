@@ -9,7 +9,7 @@ interface Province {
 interface ProvincePickerProps {
   title: string;
   provinces: Province[];
-  onSelectProvince: (provinceId: number) => void;
+  onSelectProvince: (provinceId: number, name: string) => void;
 }
 
 export default function ProvincePicker({ title, provinces, onSelectProvince }: ProvincePickerProps) {
@@ -45,7 +45,7 @@ export default function ProvincePicker({ title, provinces, onSelectProvince }: P
 
   const handleProvinceSelect = (province: Province) => {
     setSelectedProvince(province);
-    onSelectProvince(province.id);
+    onSelectProvince(province.id, province.provinceName);
     setIsOpen(false);
   };
 

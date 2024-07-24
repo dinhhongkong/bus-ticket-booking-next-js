@@ -1,4 +1,4 @@
-import {fetchData} from "../api/apiClient";
+import {fetchData} from "@/api/apiClient";
 import {useEffect, useState} from "react";
 
 export function useProvince() {

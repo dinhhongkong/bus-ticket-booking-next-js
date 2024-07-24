@@ -8,18 +8,40 @@ export function CustomerProvider({ children }) {
     name: '',
     phoneNumber: '',
     email: '',
-    idTrip: 0,
-    departureDay: "2001-01-01",
-    price: 0,
-    departureTime: "00:00:00",
-    busType: "",
-    departureProvince: "",
-    destProvince: "",
-    selectedSeat: []
   });
 
+  const [tripInfo, setTripInfo] = useState(
+    {
+      departure: {
+        id: 0,
+        day: "2001-01-01",
+        time: "00:00:00",
+        price: 0,
+        type: "",
+        provinceStart: "",
+        provinceEnd: "",
+        disableSeat: [],
+        selectedSeat: []
+      },
+      destination: {
+        id: 0,
+        day: "2001-01-01",
+        time: "00:00:00",
+        price: 0,
+        type: "",
+        provinceStart: "",
+        provinceEnd: "",
+        disableSeat: [],
+        selectedSeat: []
+      },
+      isRoundTrip: false
+    }
+  )
+
+
+
   return (
-    <CustomerContext.Provider value={{ customerInfo, setCustomerInfo }}>
+    <CustomerContext.Provider value={{ customerInfo, setCustomerInfo, tripInfo, setTripInfo  }}>
       {children}
     </CustomerContext.Provider>
   );

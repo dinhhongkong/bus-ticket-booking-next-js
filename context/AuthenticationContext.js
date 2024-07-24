@@ -13,7 +13,6 @@ export function AuthenticationProvider({children}) {
   });
 
   useEffect(() => {
-    console.log("useEffect chạy"); // Thêm log để kiểm tra
     const token = localStorage.getItem('token');
     if (token) {
       const validateToken = async () => {
