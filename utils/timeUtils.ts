@@ -37,3 +37,20 @@ export function formatDate(dateString: string): string {
   // Tạo chuỗi mới với định dạng dd-MM-yyyy
   return `${day}/${month}/${year}`;
 }
+
+
+
+/**
+ * So sánh hai ngày có định dạng "yyyy-MM-dd".
+ * @param {string} date1 - Ngày thứ nhất, định dạng "yyyy-MM-dd".
+ * @param {string} date2 - Ngày thứ hai, định dạng "yyyy-MM-dd".
+ * @returns {boolean} - Trả về true nếu date1 lớn hơn date2, ngược lại trả về false.
+ */
+export function isDateGreaterThan(date1, date2) {
+  // Chuyển đổi chuỗi ngày thành đối tượng Date
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+
+  // So sánh hai đối tượng Date
+  return d1 > d2;
+}
