@@ -15,7 +15,7 @@ interface TripProps {
   "departureProvince": string,
   "destProvince": string
 }
-export default function Trip( tripProps:TripProps ) {
+export default function Trip( {tripProps , onClickTrip} ) {
   return (
     <div className={"rounded-xl border-2  px-4 py-4 shadow mb-5 hover:border-orange-500 hover:shadow-2xl transition-shadow"}>
 
@@ -63,10 +63,10 @@ export default function Trip( tripProps:TripProps ) {
       {/*<hr/>*/}
 
       <div className={"flex flex-grow "}>
-        <Link className={"mr-0 ml-auto rounded-xl font-medium bg-orange-200 text-orange-600 p-1 hover:bg-orange-600 hover:text-white"}
-              href={"/booking-ticket/"+tripProps.id}>
+        <button className={"mr-0 ml-auto rounded-xl font-medium bg-orange-200 text-orange-600 p-1 hover:bg-orange-600 hover:text-white"}
+              onClick={onClickTrip}>
           <span className={"m-1"}>Chọn chuyến</span>
-        </Link>
+        </button>
       </div>
 
     </div>

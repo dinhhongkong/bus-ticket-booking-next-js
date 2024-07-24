@@ -28,12 +28,12 @@ export function formatDate(dateString: string): string {
   // Kiểm tra xem chuỗi ngày có đúng định dạng không
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!regex.test(dateString)) {
-    throw new Error('Invalid date format. Expected yyyy-dd-MM');
+    throw new Error('Invalid date format. Expected yyyy-MM-dd');
   }
 
   // Tách chuỗi thành các phần
-  const [year, day, month] = dateString.split('-');
+  const [year, month, day] = dateString.split('-');
 
   // Tạo chuỗi mới với định dạng dd-MM-yyyy
-  return `${day}-${month}-${year}`;
+  return `${day}/${month}/${year}`;
 }

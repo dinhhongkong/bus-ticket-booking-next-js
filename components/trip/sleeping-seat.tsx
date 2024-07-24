@@ -1,20 +1,6 @@
-import { useState, useEffect } from "react";
 import Image from "next/image";
 
-export default function SleepingSeat() {
-  const [selectedSeats, setSelectedSeats] = useState([]);
-  const [disabledSeats, setDisabledSeats] = useState([]);
-
-  useEffect(() => {
-    // Giả sử bạn có một API để lấy danh sách ghế đã được đặt
-    fetchDisabledSeats();
-  }, []);
-
-  const fetchDisabledSeats = async () => {
-    // Thay thế bằng cuộc gọi API thực tế
-    const disabledSeatsData = ["A03", "B07", "B12"];
-    setDisabledSeats(disabledSeatsData);
-  };
+export default function SleepingSeat({disabledSeats, selectedSeats, setSelectedSeats}) {
 
   const handleSeatClick = (seatNumber) => {
     if (disabledSeats.includes(seatNumber)) return;
@@ -27,10 +13,6 @@ export default function SleepingSeat() {
         return [...prevSelectedSeats, seatNumber];
       }
     });
-  };
-
-  const test = () => {
-    console.log(selectedSeats)
   };
 
 

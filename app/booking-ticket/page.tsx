@@ -4,17 +4,100 @@ import PriceDetail from "@/components/trip/price-detail";
 import SleepingSeat from "@/components/trip/sleeping-seat";
 import LimousineSeat from "@/components/trip/limousine-seat";
 import {Form, Input} from "antd";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {fetchData} from "@/api/apiClient";
+import {useRouter, useSearchParams} from "next/navigation";
+import {useCustomerInfo} from "@/context/CustomerContext";
+import {useNotification} from "@/context/NotificationContext";
+import {set} from "yaml/dist/schema/yaml-1.1/set";
 
-export default function BookingTicket({params}) {
+interface TripDetails {
+  id: number,
+  departureDay: string,
+  price: number,
+  departureTime: string,
+  busType: string,
+  departureProvince: string,
+  destProvince: string,
+  disableSeat: [] | null
+}
+
+export default function BookingTicket() {
+  const detailsParams = useSearchParams()
+  const id = detailsParams.get("id")
+  const {setNotification} = useNotification()
+
+  const [details, setDetails] = useState<TripDetails>(null);
+  const {customerInfo, setCustomerInfo } = useCustomerInfo();
+  const [selectedSeats, setSelectedSeats] = useState([]);
+
+  const router = useRouter();
+
+  const onClickPayment = (event) => {
+    if (selectedSeats.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế', type: 'error' })
+      return
+    }
+    else if (customerInfo.name.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng  điền họ và tên', type: 'error' })
+      return
+    }
+    else if (customerInfo.phoneNumber.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền số điện thoại', type: 'error' })
+      return
+    }
+    else if (customerInfo.email.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền địa chỉ email', type: 'error' })
+      return
+    }
+
+    setCustomerInfo(
+      prevInfo => ({
+          ...prevInfo,
+        departureTime: details.departureTime,
+        departureDay: details.departureDay,
+        price: details.price,
+        selectedSeat: selectedSeats,
+        departureProvince: details.departureProvince,
+        destProvince: details.destProvince
+      })
+    )
+    router.push("/payment")
+  };
+
+  const onChangeName = (event) => {
+    setCustomerInfo(
+      prevInfo => ({
+        ...prevInfo,
+        name: event.target.value
+      })
+    )
+  }
+
+  const onChangePhoneNumber = (event) => {
+    setCustomerInfo(
+      prevInfo => ({
+        ...prevInfo,
+        phoneNumber: event.target.value
+      })
+    )
+  }
+
+  const onChangeEmail = (event) => {
+    setCustomerInfo(
+      prevInfo => ({
+        ...prevInfo,
+        email: event.target.value
+      })
+    )
+  }
 
 
   useEffect(() => {
-    async function loadProvinces() {
+    async function loadTripDetails() {
       try {
-        const data = await fetchData('/booking/trip/' + params.slug);
-
+        const data :TripDetails = await fetchData('/booking/trip/' + id);
+        setDetails(data)
         console.log(data)
       } catch (err) {
         console.error('Error loading provinces:', err);
@@ -22,7 +105,7 @@ export default function BookingTicket({params}) {
 
       }
     }
-    loadProvinces();
+    loadTripDetails();
   }, []);
 
 
@@ -35,9 +118,17 @@ export default function BookingTicket({params}) {
             <div className={"flex w-full flex-col rounded-xl border bg-white divide-x"}>
               {/*select seat*/}
               <div className={"my-4 flex flex-row text-center font-medium gap-4 sm:gap-6"}>
-                {/*<SleepingSeat/>*/}
-                <LimousineSeat/>
-                <SleepingSeat/>
+
+                {details?.busType === "Giường" && (
+                  <SleepingSeat disabledSeats={details.disableSeat}
+                                selectedSeats={selectedSeats}
+                                setSelectedSeats={setSelectedSeats}/>
+                )}
+
+                {details?.busType ==="Limousine" && (
+                  <LimousineSeat/>
+                )}
+
               </div>
               <div className="mb-4 flex justify-center gap-4 text-[13px] font-normal">
                   <span className="mr-8 flex items-center">
@@ -62,17 +153,17 @@ export default function BookingTicket({params}) {
                   <Form className={"mt-6"} name="validateOnly" layout="vertical" autoComplete="off">
                     <Form.Item name="fullname" label="Họ và tên"
                                rules={[{required: true, type: "string", message: "Vui lòng điền họ và tên"}]}>
-                      <Input/>
+                      <Input  onChange={onChangeName}  />
                     </Form.Item>
 
                     <Form.Item name="phone" label="Số điện thoại"
                                rules={[{required: true, message: "Vui lòng điền số điện thoại"}]}>
-                      <Input/>
+                      <Input onChange={onChangePhoneNumber}/>
                     </Form.Item>
 
                     <Form.Item name="email" label="Email"
                                rules={[{required: true, type: "email", message: "Vui lòng điền Email"}]}>
-                      <Input/>
+                      <Input onChange={onChangeEmail}/>
                     </Form.Item>
                   </Form>
                 </div>
@@ -169,7 +260,9 @@ export default function BookingTicket({params}) {
                           className="w-28 h-10 bg-white border-2 text-orange-600 rounded-full mr-7 hover:bg-orange-500 hover:text-white ">
                     <span>Hủy</span>
                   </button>
-                  <button type="button" className="w-28 h-10 bg-orange-500 text-white  rounded-full">
+                  <button type="button" className="w-28 h-10 bg-orange-500 text-white  rounded-full"
+                          onClick={onClickPayment}
+                  >
                     <span>Thanh toán</span>
                   </button>
                 </div>
@@ -181,9 +274,24 @@ export default function BookingTicket({params}) {
           </div>
 
           <div className={"mx-auto flex min-w-[345px] flex-col gap-6"}>
-            <TripDetail/>
-            <TripDetail/>
-            <PriceDetail/>
+            {details != null && (
+              <>
+                <TripDetail title={"lượt đi"}
+                            date={details.departureDay}
+                            time={details.departureTime}
+                            price={details.price}
+                            seats={selectedSeats}
+                            provinceStart={details.departureProvince}
+                            provinceEnd={details.destProvince}
+                />
+                <PriceDetail  price={details.price}
+                              seats={selectedSeats}/>
+              </>
+
+
+            )}
+
+
 
           </div>
 

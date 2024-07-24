@@ -3,6 +3,7 @@ import {Tabs} from "antd";
 import LoginForm from "@/components/login/login-form";
 import Image from "next/image";
 import RegisterForm from "@/components/login/register-form";
+import {useNotification} from "@/context/NotificationContext";
 
 const items = [
   {
@@ -18,9 +19,8 @@ const items = [
 ];
 
 export default function Login(){
-  function hello( event) {
-    console.log("hello world")
-  }
+
+
   return(
     <main className={"w-full"}>
       <div className={"relative max-w-[1128px] mx-auto pt-[360px] flex flex-col"}>
@@ -56,7 +56,6 @@ export default function Login(){
             <div className="text-2xl  font-medium">Đăng nhập tài khoản</div>
             <Tabs defaultActiveKey="1"
                   items={items}
-                  onChange={hello}
                   itemHoverColor={"#ea580c"}
             >
 

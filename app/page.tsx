@@ -10,7 +10,9 @@ import Trip from "@/components/trip/trip";
 import {useProvince} from "@/hook/useProvince";
 import {fetchData} from "@/api/apiClient";
 import Loading from "@/components/loading";
+import { useRouter } from 'next/navigation';
 import Notification from "@/components/notification/notification";
+import {useNotification} from "@/context/NotificationContext";
 
 interface SearchProps{
   departureProvinceId: number,
@@ -21,6 +23,8 @@ interface SearchProps{
 }
 
 export default function Home() {
+
+  const {setNotification} = useNotification()
 
   const [startDate, setStartDate] = useState({
     startDate: null,
@@ -44,6 +48,12 @@ export default function Home() {
 
   const [responseSearch, setResponseSearch] = useState([])
   const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  const handleTripSelection = (tripId) => {
+    router.push(`/booking-ticket?id=${tripId}&isRoundTrip=${isRoundTrip}`)
+  };
 
   const updateDepartureProvinceId = (newId: number) => {
     setSearchProps(prevState => ({
@@ -84,6 +94,23 @@ export default function Home() {
 
 
   const onClickBtnSearch = async (event) => {
+    if (searchProps.startDate.length === 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày đi', type: 'error' })
+      return
+    }
+    else if (searchProps.endDate?.length ===0 && isRoundTrip == true) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điền ngày về', type: 'error' })
+      return
+    }
+    else if (searchProps.departureProvinceId == 0) {
+      setNotification({ show: true, message: 'Quý khách vui chọn điểm đi', type: 'error' })
+      return
+    }
+    else if (searchProps.destinationProvinceId == 0) {
+      setNotification({ show: true, message: 'Quý khách vui lòng điểm đến', type: 'error' })
+      return
+    }
+
     setIsLoading(true)
     try {
       const data = await fetchData("booking/search/trip", searchProps);
@@ -323,7 +350,7 @@ export default function Home() {
                 <Loading/>
               ) : responseSearch.length > 0 ? (
                 responseSearch.map((trip) => (
-                  <Trip key={trip.id} {...trip} />
+                  <Trip key={trip.id} tripProps={trip} onClickTrip={()=>handleTripSelection(trip.id)} />
                 ))
               ) : (
                 <p>Không có chuyến đi nào được tìm thấy.</p>

@@ -1,4 +1,4 @@
-// contexts/CustomerContext.js
+"use client"
 import { createContext, useState, useContext } from 'react';
 
 const CustomerContext = createContext();
@@ -6,8 +6,16 @@ const CustomerContext = createContext();
 export function CustomerProvider({ children }) {
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
-    phone: '',
+    phoneNumber: '',
     email: '',
+    idTrip: 0,
+    departureDay: "2001-01-01",
+    price: 0,
+    departureTime: "00:00:00",
+    busType: "",
+    departureProvince: "",
+    destProvince: "",
+    selectedSeat: []
   });
 
   return (

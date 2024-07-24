@@ -18,6 +18,11 @@
     color: white;
 }
 
+.warning {
+    background-color: #ffe100;
+    color: white;
+}
+
 .error {
     background-color: #f44336;
     color: white;

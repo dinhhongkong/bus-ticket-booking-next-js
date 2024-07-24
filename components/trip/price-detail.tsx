@@ -1,6 +1,7 @@
 import Image from "next/image";
+import {formatCurrency} from "@/utils/formatCurrency";
 
-export default function PriceDetail() {
+export default function PriceDetail( {price, seats}) {
   return (
     <div className="w-full rounded-xl border border-[#DDE2E8] bg-white px-4 py-3 text-[15px]">
       <div className="icon-orange flex gap-2 text-xl font-medium text-black">
@@ -9,12 +10,12 @@ export default function PriceDetail() {
         </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="text-gray-500">Giá vé lượt đi</span>
-        <span className="text-orange-500">550.000đ</span>
+        <span className="text-orange-500">{formatCurrency(price * seats.length)}</span>
       </div>
-      <div className="mt-1 flex items-center justify-between">
-        <span className="text-gray-500">Giá vé lượt về</span>
-        <span className="text-orange-500">0đ</span>
-      </div>
+      {/*<div className="mt-1 flex items-center justify-between">*/}
+      {/*  <span className="text-gray-500">Giá vé lượt về</span>*/}
+      {/*  <span className="text-orange-500">0đ</span>*/}
+      {/*</div>*/}
       <div className="mt-1 flex items-center justify-between">
         <span className="text-gray-500">Phí thanh toán</span>
         <span className="text-black">0đ</span>
@@ -22,7 +23,7 @@ export default function PriceDetail() {
       <div className="divide my-3"></div>
       <div className="flex items-center justify-between">
         <span className="text-gray-500">Tổng tiền</span>
-        <span className="text-orange-500">550.000đ</span>
+        <span className="text-orange-500">{formatCurrency(price * seats.length)}</span>
       </div>
     </div>
 )
