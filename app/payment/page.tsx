@@ -4,7 +4,7 @@ import TripDetail from "@/components/trip/trip-detail";
 import {formatCurrency} from "@/utils/formatCurrency";
 
 export default function Payment() {
-  const {customerInfo, setCustomerInfo } = useCustomerInfo();
+  const {tripInfo, customerInfo, setCustomerInfo } = useCustomerInfo();
 
 
   const handlePaymentMethodChange = async (event) => {
@@ -68,16 +68,24 @@ export default function Payment() {
           <div className="icon-orange flex gap-2 text-xl font-medium text-black">Chi tiết giá</div>
           <div className="mt-4 flex items-center justify-between"><span
             className="text-gray">Giá vé lượt đi</span><span
-            className="text-orange">{formatCurrency(customerInfo.price * customerInfo.selectedSeat.length)}</span></div>
-          {/*<div className="mt-1 flex items-center justify-between"><span*/}
-          {/*    className="text-gray">Giá vé lượt về</span><span*/}
-          {/*    className="text-orange">0đ</span></div>*/}
+            className="text-orange">{formatCurrency(tripInfo.departure.price * tripInfo.departure.selectedSeat.length)}</span></div>
+          {tripInfo.isRoundTrip && (
+            <div className="mt-1 flex items-center justify-between"><span
+              className="text-gray">Giá vé lượt về</span><span
+              className="text-orange">{formatCurrency(tripInfo.destination.price * tripInfo.destination.selectedSeat.length)}</span>
+            </div>
+          )}
+
           <div className="mt-1 flex items-center justify-between"><span
             className="text-gray">Phí thanh toán</span><span
             className="text-black">0đ</span></div>
           <div className="divide my-3"></div>
-          <div className="flex items-center justify-between"><span className="text-gray">Tổng tiền</span><span
-            className="text-orange">{formatCurrency(customerInfo.price * customerInfo.selectedSeat.length)}</span></div>
+          <div className="flex items-center justify-between"><span className="text-gray">Tổng tiền</span>
+            <span className="text-orange">{formatCurrency(
+              tripInfo.departure.price * tripInfo.departure.selectedSeat.length
+                      +
+                      tripInfo.destination.price * tripInfo.destination.selectedSeat.length)}</span>
+          </div>
         </div>
       </div>
       <div className="w-1/2 p-4">
@@ -99,13 +107,25 @@ export default function Payment() {
 
         {/*Thông tin chuyến đi*/}
         <TripDetail title={"lượt đi"}
-                    date={customerInfo.departureDay}
-                    time={customerInfo.departureTime}
-                    price={customerInfo.price}
-                    seats={customerInfo.selectedSeat}
-                    provinceStart={customerInfo.departureProvince}
-                    provinceEnd={customerInfo.destProvince}
+                    date={tripInfo.departure.day}
+                    time={tripInfo.departure.time}
+                    price={tripInfo.departure.price}
+                    seats={tripInfo.departure.selectedSeat}
+                    provinceStart={tripInfo.departure.provinceStart}
+                    provinceEnd={tripInfo.departure.provinceEnd}
         />
+        <div className={"h-4"}/>
+
+        {tripInfo.isRoundTrip && (
+          <TripDetail title={"lượt về"}
+                      date={tripInfo.destination.day}
+                      time={tripInfo.destination.time}
+                      price={tripInfo.destination.price}
+                      seats={tripInfo.destination.selectedSeat}
+                      provinceStart={tripInfo.destination.provinceStart}
+                      provinceEnd={tripInfo.destination.provinceEnd}
+          />
+        )}
 
         {/*thông tin chuyến về nếu có khứ hồi*/}
 

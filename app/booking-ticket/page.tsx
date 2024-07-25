@@ -3,13 +3,15 @@ import TripDetail from "@/components/trip/trip-detail";
 import PriceDetail from "@/components/trip/price-detail";
 import SleepingSeat from "@/components/trip/sleeping-seat";
 import LimousineSeat from "@/components/trip/limousine-seat";
-import {Form, Input} from "antd";
+import {Form, Input, Select} from "antd";
 import {useEffect, useState} from "react";
 import {fetchData} from "@/api/apiClient";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useCustomerInfo} from "@/context/CustomerContext";
 import {useNotification} from "@/context/NotificationContext";
 import {set} from "yaml/dist/schema/yaml-1.1/set";
+import {formatCurrency} from "@/utils/formatCurrency";
+import Station from "@/components/trip/station";
 
 interface TripDetails {
   id: number,
@@ -20,34 +22,67 @@ interface TripDetails {
   departureProvince: string,
   destProvince: string,
   disableSeat: [] | null
+  pickup: [],
+  dropOff: []
 }
 
 export default function BookingTicket() {
   const {setNotification} = useNotification()
-  const {customerInfo, setCustomerInfo ,tripInfo, setTripInfo} = useCustomerInfo()
-  const [selectedSeats, setSelectedSeats] = useState([]);
+  const {customerInfo, setCustomerInfo, tripInfo, setTripInfo} = useCustomerInfo()
+  const [selectedSeatsDepart, setSelectedSeatsDepart] = useState([]);
+  const [selectedSeatsDest, setSelectedSeatsDest] = useState([]);
+  const [pickupDepart, setPickupDepart] = useState([])
+  const [pickupDest, setPickupDest] = useState([])
+  const [dropOffDepart, setDropOffDepart] = useState([])
+  const [dropOffDest, setDropOffDest] = useState([])
 
 
   const router = useRouter();
 
   const onClickPayment = (event) => {
     console.log(tripInfo)
-    if (selectedSeats.length === 0) {
-      setNotification({ show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế', type: 'error' })
+    if (selectedSeatsDepart.length === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế cho chuyến đi', type: 'error'})
       return
-    }
-    else if (customerInfo.name.length === 0) {
-      setNotification({ show: true, message: 'Quý khách vui lòng  điền họ và tên', type: 'error' })
+    } else if (customerInfo.name.length === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng  điền họ và tên', type: 'error'})
       return
-    }
-    else if (customerInfo.phoneNumber.length === 0) {
-      setNotification({ show: true, message: 'Quý khách vui lòng điền số điện thoại', type: 'error' })
+    } else if (customerInfo.phoneNumber.length === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng điền số điện thoại', type: 'error'})
       return
-    }
-    else if (customerInfo.email.length === 0) {
-      setNotification({ show: true, message: 'Quý khách vui lòng điền địa chỉ email', type: 'error' })
+    } else if (customerInfo.email.length === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng điền địa chỉ email', type: 'error'})
       return
+    } else if (tripInfo.departure.pickupId === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng chọn điểm đón cho chuyến đi', type: 'error'})
+      return
+    } else if (tripInfo.departure.dropOffId === 0) {
+      setNotification({show: true, message: 'Quý khách vui lòng chọn điểm trả cho chuyến đi', type: 'error'})
+      return
+    } else if (tripInfo.isRoundTrip) {
+      if (selectedSeatsDest.length === 0) {
+        setNotification({show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế cho chuyến về', type: 'error'})
+        return
+      } else if (tripInfo.destination.pickupId === 0) {
+        setNotification({show: true, message: 'Quý khách vui lòng chọn điểm đón cho chuyến về', type: 'error'})
+        return
+      } else if (tripInfo.destination.dropOffId === 0) {
+        setNotification({show: true, message: 'Quý khách vui lòng chọn điểm trả cho chuyến về', type: 'error'})
+        return
+      }
     }
+    setTripInfo(preState => ({
+      ...preState,
+      departure: {
+        ...preState.departure,
+        selectedSeat: selectedSeatsDepart
+      },
+      destination: {
+        ...preState.departure,
+        selectedSeat: selectedSeatsDest
+      }
+    }))
+
 
     router.push("/payment")
   };
@@ -79,12 +114,51 @@ export default function BookingTicket() {
     )
   }
 
+  const onChangePickupDepart = (id) => {
+    setTripInfo(preState => ({
+      ...preState,
+      departure: {
+        ...preState.departure,
+        pickupId: id
+      }
+    }))
+  }
+
+  const onChangeDropOffDepart = (id) => {
+    setTripInfo(preState => ({
+      ...preState,
+      departure: {
+        ...preState.departure,
+        dropOffId: id
+      }
+    }))
+  }
+
+  const onChangePickupDest = (id) => {
+    setTripInfo(preState => ({
+      ...preState,
+      destination: {
+        ...preState.destination,
+        pickupId: id
+      }
+    }))
+  }
+
+  const onChangeDropOffDest = (id) => {
+    setTripInfo(preState => ({
+      ...preState,
+      destination: {
+        ...preState.destination,
+        dropOffId: id
+      }
+    }))
+  }
+
 
   useEffect(() => {
     async function loadTripDetails() {
       try {
-        const data1 :TripDetails = await fetchData('/booking/trip/' + tripInfo.departure.id);
-        console.log(data1)
+        const data1: TripDetails = await fetchData('/booking/trip/' + tripInfo.departure.id);
         setTripInfo(preState => ({
           ...preState,
           departure: {
@@ -98,9 +172,10 @@ export default function BookingTicket() {
             disableSeat: data1["disableSeat"]
           }
         }))
-        console.log(tripInfo)
-        if(tripInfo.isRoundTrip) {
-          const data2 :TripDetails = await fetchData('/booking/trip/' + tripInfo.destination.id);
+        setPickupDepart(data1.pickup)
+        setDropOffDepart(data1.dropOff)
+        if (tripInfo.isRoundTrip) {
+          const data2: TripDetails = await fetchData('/booking/trip/' + tripInfo.destination.id);
 
           setTripInfo(preState => ({
             ...preState,
@@ -115,16 +190,17 @@ export default function BookingTicket() {
               disableSeat: data2["disableSeat"]
             }
           }))
-          console.log(tripInfo)
+          setPickupDest(data2.pickup)
+          setDropOffDest(data2.dropOff)
         }
 
       } catch (err) {
         console.error('Error loading provinces:', err);
-      }
-      finally {
+      } finally {
         console.log(tripInfo)
       }
     }
+
     loadTripDetails()
   }, []);
 
@@ -141,28 +217,27 @@ export default function BookingTicket() {
 
                 {tripInfo.departure.type === "Giường" && (
                   <SleepingSeat disabledSeats={tripInfo.departure.disableSeat}
-                                selectedSeats={selectedSeats}
-                                setSelectedSeats={setSelectedSeats}/>
+                                selectedSeats={selectedSeatsDepart}
+                                setSelectedSeats={setSelectedSeatsDepart}/>
                 )}
 
                 {tripInfo.departure.type === "Limousine" && (
                   <LimousineSeat disabledSeats={tripInfo.departure.disableSeat}
-                                selectedSeats={selectedSeats}
-                                setSelectedSeats={setSelectedSeats}/>
+                                 selectedSeats={selectedSeatsDepart}
+                                 setSelectedSeats={setSelectedSeatsDepart}/>
                 )}
 
-                {tripInfo.destination.type === "Giường" && (
+                {tripInfo.isRoundTrip && tripInfo.destination.type === "Giường" && (
                   <SleepingSeat disabledSeats={tripInfo.destination.disableSeat}
-                                selectedSeats={selectedSeats}
-                                setSelectedSeats={setSelectedSeats}/>
+                                selectedSeats={selectedSeatsDest}
+                                setSelectedSeats={setSelectedSeatsDest}/>
                 )}
 
-                {tripInfo.destination.type === "Limousine" && (
+                {tripInfo.isRoundTrip && tripInfo.destination.type === "Limousine" && (
                   <LimousineSeat disabledSeats={tripInfo.destination.disableSeat}
-                                 selectedSeats={selectedSeats}
-                                 setSelectedSeats={setSelectedSeats}/>
+                                 selectedSeats={selectedSeatsDest}
+                                 setSelectedSeats={setSelectedSeatsDest}/>
                 )}
-
 
 
               </div>
@@ -189,7 +264,7 @@ export default function BookingTicket() {
                   <Form className={"mt-6"} name="validateOnly" layout="vertical" autoComplete="off">
                     <Form.Item name="fullname" label="Họ và tên"
                                rules={[{required: true, type: "string", message: "Vui lòng điền họ và tên"}]}>
-                      <Input  onChange={onChangeName}  />
+                      <Input onChange={onChangeName}/>
                     </Form.Item>
 
                     <Form.Item name="phone" label="Số điện thoại"
@@ -219,77 +294,37 @@ export default function BookingTicket() {
               </div>
               <div className="h-1 bg-[#f3f3f5] w-full"></div>
 
-              <div className="flex w-full flex-col p-4 text-[15px] md:p-6">
-                <div className="icon-orange flex gap-4 text-xl font-medium text-black">Thông tin đón trả</div>
-                <div className="mt-6 flex gap-6 ">
-                  <div className="flex flex-1 flex-col gap-4"><span
-                    className="text-base font-medium uppercase">Điểm đón</span>
-                    <div className="relative flex justify-between">
-                      <div className="">
-                        <label className="">
-                          <span className="">
-                          <input type="radio" className="" value="0"/>
-                          <span className=""></span>
-                          </span>
-                          <span>Điểm đón</span>
-                        </label>
-                        <label className="">
-                          <span className="ant-radio">
-                            <input type="radio" className="a" value="1"/>
-                            <span className="ant-radio-inner"></span>
-                          </span>
-                            <span>Trung chuyển</span>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="p-2 rounded flex w-full cursor-pointer items-center justify-between border text-[15px] ">
-                      <span>BX Mien Đông Mới</span>
-                      <div className="icon-gray"></div>
-                    </div>
-                    <div className="flex flex-wrap gap-1 ">
-                      <span className="">Quý khách vui lòng có mặt tại Bến xe/Văn Phòng</span>
-                      <span className="font-semibold">BX Mien Đông Mới</span>
-                      <span className="font-semibold  text-red-500">Trước 09:15 16/07/2024</span>
-                      <span className="">để được trung chuyển hoặc kiểm tra thông tin trước khi lên xe.</span>
-                    </div>
-                  </div>
-                  <div className="h-full w-[1px] border-r"></div>
-                  <div className="flex flex-1 flex-col gap-4"><span
-                    className="text-base font-medium uppercase">Điểm trả</span>
-                    <div className="relative flex justify-between">
-                      <div className="">
-                        <label
-                          className="">
-                          <span
-                            className="">
-                            <input type="radio" className="" value="0"/>
-                            <span className=""></span>
-                          </span>
-                          <span>Điểm trả</span>
-                        </label>
-                        <label className="">
-                          <span className="">
-                            <input type="radio" className="" value="1"/>
-                            <span className=""></span>
-                          </span>
-                          <span>Trung chuyển</span>
-                        </label>
-                      </div>
-                    </div>
-                    <div className="p-2 rounded input-form flex w-full cursor-pointer items-center justify-between border text-[15px] ">
-                      <span>Dak Lak</span>
-                      <div className="icon-gray"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <Station title={"chuyến đi"}
+                       pickup={pickupDepart}
+                       dropOff={dropOffDepart}
+                       day={tripInfo.departure.day}
+                       onChangeDropOff={onChangeDropOffDepart}
+                       onChangePickup={onChangePickupDepart}
+              />
+
+              <div className="h-1 bg-[#f3f3f5] w-full"></div>
+
+              {
+                tripInfo.isRoundTrip && (
+                  <Station
+                    title={"chuyến về"}
+                    pickup={pickupDest}
+                    dropOff={dropOffDest}
+                    day={tripInfo.destination.day}
+                    onChangeDropOff={onChangePickupDest}
+                    onChangePickup={onChangeDropOffDest}
+                  />
+                )
+              }
 
               <div className="h-1 bg-[#f3f3f5] w-full"></div>
 
               <div className="flex items-center p-6">
                 <div className="flex flex-col">
                   <span className=" px-2 rounded-xl bg-[#00613D] py-2 text-center text-xs text-white">Tổng cộng</span>
-                  <span className="mt-2 text-2xl font-medium text-black">100.000đ</span>
+                  <span className="mt-2 text-2xl font-medium text-black">{
+                    formatCurrency(tripInfo.departure.price * selectedSeatsDepart.length
+                      + tripInfo.destination.price * selectedSeatsDest.length)}</span>
                 </div>
                 <div className="flex flex-auto items-center justify-end">
                   <button type="button"
@@ -316,17 +351,28 @@ export default function BookingTicket() {
                             date={tripInfo.departure.day}
                             time={tripInfo.departure.time}
                             price={tripInfo.departure.price}
-                            seats={selectedSeats}
+                            seats={selectedSeatsDepart}
                             provinceStart={tripInfo.departure.provinceStart}
                             provinceEnd={tripInfo.departure.provinceEnd}
                 />
-                <PriceDetail  price={tripInfo.departure.price}
-                              seats={selectedSeats}/>
+                {tripInfo.isRoundTrip && (
+                  <TripDetail title={"lượt về"}
+                              date={tripInfo.destination.day}
+                              time={tripInfo.destination.time}
+                              price={tripInfo.destination.price}
+                              seats={selectedSeatsDest}
+                              provinceStart={tripInfo.destination.provinceStart}
+                              provinceEnd={tripInfo.destination.provinceEnd}
+                  />
+                )}
+                <PriceDetail departurePrice={tripInfo.departure.price}
+                             departureSeats={selectedSeatsDepart}
+                             destinationSeats={selectedSeatsDest}
+                             destinationPrice={tripInfo.destination.price}
+                             isRoundTrip={tripInfo.isRoundTrip}
+                />
               </>
             )}
-
-
-
 
 
           </div>

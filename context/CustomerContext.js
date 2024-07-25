@@ -21,7 +21,9 @@ export function CustomerProvider({ children }) {
         provinceStart: "",
         provinceEnd: "",
         disableSeat: [],
-        selectedSeat: []
+        selectedSeat: [],
+        pickupId: 0,
+        dropOffId: 0
       },
       destination: {
         id: 0,
@@ -32,7 +34,9 @@ export function CustomerProvider({ children }) {
         provinceStart: "",
         provinceEnd: "",
         disableSeat: [],
-        selectedSeat: []
+        selectedSeat: [],
+        pickupId: 0,
+        dropOffId: 0
       },
       isRoundTrip: false
     }
