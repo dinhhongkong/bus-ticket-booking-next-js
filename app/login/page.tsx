@@ -58,13 +58,8 @@ export default function Login(){
                   items={items}
                   itemHoverColor={"#ea580c"}
             >
-
             </Tabs>
-
-
           </div>
-
-
 
         </div>
       </div>
