@@ -2,14 +2,66 @@
 import {useCustomerInfo} from "@/context/CustomerContext";
 import TripDetail from "@/components/trip/trip-detail";
 import {formatCurrency} from "@/utils/formatCurrency";
+import {postData} from "@/api/apiClient";
+import {useNotification} from "@/context/NotificationContext";
+import {useAuth} from "@/context/AuthenticationContext";
+import {doubleToInt} from "@/utils/numberUtils";
 
 export default function Payment() {
   const {tripInfo, customerInfo, setCustomerInfo } = useCustomerInfo();
+  const {auth} = useAuth()
+  const {setNotification} = useNotification()
 
+  const totalAmount = ()=> {
+    let total = tripInfo.departure.price * tripInfo.departure.selectedSeat.length;
+    if (tripInfo.isRoundTrip) {
+      total += tripInfo.destination.price * tripInfo.destination.selectedSeat.length;
+    }
+    return doubleToInt(total);
 
+  }
+
+  const createBody = (method: string) => {
+    return  {
+      userId: auth.customerId,
+      trip: {
+        id: tripInfo.departure.id,
+        tickets: tripInfo.departure.selectedSeat,
+        pickupId: tripInfo.departure.pickupId,
+        dropOffId: tripInfo.departure.dropOffId
+      },
+      ...(tripInfo.isRoundTrip && {
+        returnTrip: {
+          id: tripInfo.destination.id,
+          tickets: tripInfo.destination.selectedSeat,
+          pickupId: tripInfo.destination.pickupId,
+          dropOffId: tripInfo.destination.dropOffId
+        }
+      }),
+      name: customerInfo.name,
+      phoneNumber: customerInfo.phoneNumber,
+      email: customerInfo.email,
+      paymentMethod: method,
+      amount: totalAmount()
+    }
+  }
   const handlePaymentMethodChange = async (event) => {
     if (event.target.value === 'VNPAY') {
+      const payment = async () => {
 
+        try {
+          const response = await postData("/payment/VNPay", createBody("VNPAY") );
+          console.log(response)
+        } catch (error) {
+          console.error('Error ', error.response.data.message);
+          setNotification({ show: true, message: error.response.data.message, type: 'error' })
+
+        }
+      };
+      payment()
+    }
+    else {
+      setNotification({ show: true, message: "Nền tảng thanh toán đang bảo trì", type: 'error' })
     }
   };
 
