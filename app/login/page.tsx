@@ -56,7 +56,6 @@ export default function Login(){
             <div className="text-2xl  font-medium">Đăng nhập tài khoản</div>
             <Tabs defaultActiveKey="1"
                   items={items}
-                  itemHoverColor={"#ea580c"}
             >
             </Tabs>
           </div>

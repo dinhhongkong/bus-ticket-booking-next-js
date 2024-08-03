@@ -9,7 +9,6 @@ import {fetchData} from "@/api/apiClient";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useCustomerInfo} from "@/context/CustomerContext";
 import {useNotification} from "@/context/NotificationContext";
-import {set} from "yaml/dist/schema/yaml-1.1/set";
 import {formatCurrency} from "@/utils/formatCurrency";
 import Station from "@/components/trip/station";
 
@@ -39,7 +38,7 @@ export default function BookingTicket() {
 
   const router = useRouter();
 
-  const onClickPayment = (event) => {
+  const onClickPayment = () => {
     console.log(tripInfo)
     if (selectedSeatsDepart.length === 0) {
       setNotification({show: true, message: 'Quý khách vui lòng chọn ít nhất một ghế cho chuyến đi', type: 'error'})

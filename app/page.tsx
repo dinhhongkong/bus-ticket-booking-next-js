@@ -47,7 +47,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const {tripInfo, setTripInfo} = useCustomerInfo()
-  const {tripSelection, setTripSelection} = useState()
+  // const {tripSelection, setTripSelection} = useState()
 
 
   const handleDepartureTripSelection = (tripProps) => {

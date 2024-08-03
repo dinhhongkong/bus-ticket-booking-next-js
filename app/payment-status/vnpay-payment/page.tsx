@@ -1,10 +1,12 @@
 "use client"
 import {useSearchParams} from "next/navigation";
+import {useEffect} from "react";
+import { Suspense } from 'react';
 /* url test
 http://localhost:3000/payment-status/vnpay-payment?vnp_Amount=25000000&vnp_BankCode=VNPAY&vnp_CardType=QRCODE&vnp_OrderInfo=invoice+id+25&vnp_PayDate=20240728030036&vnp_ResponseCode=24&vnp_TmnCode=N05XYEQA&vnp_TransactionNo=0&vnp_TransactionStatus=02&vnp_TxnRef=87732422&vnp_SecureHash=ea57220bc0d47db8b83abb2eb34c32d7298d11e2eb3f1ea010457b0e4cb54f4af4b292d2068fd7116efd7444becb9953fc756eb94024128d185bd6d00ca9efe0
 */
 
-export default function PaymentStatus() {
+function PaymentStatus() {
   const queryParams = useSearchParams();
 
   const vnpAmount = queryParams.get('vnp_Amount');
@@ -60,6 +62,27 @@ export default function PaymentStatus() {
     );
   }
 
+
+  useEffect(() => {
+    // Lấy URL hiện tại
+    const currentUrl = window.location.href;
+
+    // Thay đổi hostname và port cho URL mới
+    const newUrl = currentUrl.replace('localhost:3000/payment-status/vnpay-payment', 'localhost:8082/payment/VNPay/status');
+    console.log(newUrl)
+
+    // Thực hiện yêu cầu GET đến server mới ngay khi component được mount
+    fetch(newUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Data received from server: ', data);
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+
+  }, []);
+
   return (
     <div className="flex justify-center items-center">
 
@@ -102,5 +125,14 @@ export default function PaymentStatus() {
 
       </div>
     </div>
+  );
+}
+
+
+export default function PaymentStatusPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentStatus />
+    </Suspense>
   );
 }
