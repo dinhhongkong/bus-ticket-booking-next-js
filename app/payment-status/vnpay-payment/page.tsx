@@ -68,7 +68,7 @@ function PaymentStatus() {
     const currentUrl = window.location.href;
 
     // Thay đổi hostname và port cho URL mới
-    const newUrl = currentUrl.replace('localhost:3000/payment-status/vnpay-payment', 'localhost:8082/payment/VNPay/status');
+    const newUrl = currentUrl.replace('localhost:3000/payment-status/vnpay-payment', 'localhost:8080/payment/VNPay/status');
     console.log(newUrl)
 
     // Thực hiện yêu cầu GET đến server mới ngay khi component được mount

@@ -52,9 +52,11 @@ export default function Payment() {
         try {
           const response = await postData("/payment/VNPay", createBody("VNPAY") );
           console.log(response)
+          window.location.href = response;
         } catch (error) {
           console.error('Error ', error.response.data.message);
           setNotification({ show: true, message: error.response.data.message, type: 'error' })
+          return;
 
         }
       };

@@ -42,7 +42,7 @@ export default function LoginForm() {
     }
     const sendLogin = async () => {
       try {
-        const data = await postData("/api/v1/auth/login",loginRequest)
+        const data = await postData("/auth/login",loginRequest)
         login(data.accessToken)
         setNotification({ show: true, message: 'Đăng nhập thành công', type: 'success' })
         router.push(`/`)
@@ -53,12 +53,7 @@ export default function LoginForm() {
 
     }
 
-
-
-
-
     sendLogin()
-
 
   }
   return (
